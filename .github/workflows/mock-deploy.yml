@@ -15,7 +15,7 @@ jobs:
     - name: Set deployment SHA, ${{ github.event.deployment.sha }}, as environment variable
       run: |
         echo "::set-env name=DEPLOYMENT_SHA::${{ github.event.deployment.sha }}"
-        echo "::set-env name=DEPLOYMENT_URL::${{ github.event.deployment.url }}
+        echo "::set-env name=DEPLOYMENT_URL::${{ github.event.deployment.url }}"
 
     - name: Mirror deployment status as a commit status for [error, failure]
       if: github.event.deployment_status.state == 'error' || github.event.deployment_status.state == 'failure'
