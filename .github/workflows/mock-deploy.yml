@@ -12,9 +12,27 @@ jobs:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
 
-    - name: Exit early if it's not successful
+    - name: Set deployment SHA, ${{ github.event.deployment.sha }}, as environment variable
+      run: |
+        echo "::set-env name=DEPLOYMENT_SHA::${{ github.event.deployment.sha }}"
+        echo $DEPLOYMENT_SHA
+
+    - name: Create corresponding commit status from deployment status
       if: github.event.deployment_status.state != 'success'
-      run: exit 1
-    
+      uses: actions/github-script@0.4.0
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+
+          // Create a commit status associated with the deployment SHA
+          const result = github.repos.getDeployment({
+            owner: context.payload.repository.owner.login,
+            repo: context.payload.repository.name,
+            sha: process.env.DEPLOYMENT_SHA,
+            state: "failure"
+          })
+          
+          console.log(result)
+
     - name: Deploy it!
       run: echo "Deploying!"
