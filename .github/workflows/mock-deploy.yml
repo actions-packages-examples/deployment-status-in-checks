@@ -1,6 +1,9 @@
 name: Mock Deploy
 
-on: deployment_status
+on:
+  deployment:
+  deployment_status:
+
 
 jobs:
   deploy:
@@ -11,31 +14,3 @@ jobs:
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
-
-    - name: Set deployment SHA, ${{ github.event.deployment.sha }}, as environment variable
-      run: |
-        echo "::set-env name=DEPLOYMENT_SHA::${{ github.event.deployment.sha }}"
-        echo "::set-env name=DEPLOYMENT_URL::${{ github.event.deployment.url }}"
-
-    - name: Mirror deployment status as a commit status for [error, failure]
-      if: github.event.deployment_status.state == 'error' || github.event.deployment_status.state == 'failure'
-      uses: actions/github-script@0.4.0
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-
-          // Create a commit status associated with the deployment SHA
-          const result = await github.repos.createStatus({
-            owner: context.payload.repository.owner.login,
-            repo: context.payload.repository.name,
-            sha: process.env.DEPLOYMENT_SHA,
-            target_url: process.env.DEPLOYMENT_URL,
-            state: "failure",
-            context: "Actions-created deployment status",
-            description: "Deployment resulted in either error or failure, check URL for more details."
-          })
-          
-          console.log(result)
-
-    - name: Deploy it!
-      run: echo "Deploying!"
