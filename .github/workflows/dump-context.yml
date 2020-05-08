@@ -1,9 +1,9 @@
-name: Mock Deploy
+name: Dump Context
 
 on:
   deployment:
   deployment_status:
-
+  pull_request:
 
 jobs:
   deploy:
